@@ -4,10 +4,10 @@ from matplotlib import pyplot
 import numpy
 class Member(object):
 	"""This is the class for a member of the population"""
-	def __init__(self,dimensions,version):
+	def __init__(self,dimensions,length,version):
 		self.version = version
 		self.dimensions = dimensions
-		self.length = 100
+		self.length = length
 		if(version == 1):
 			
 			self.value = [0 for i in range(self.length)]
@@ -47,11 +47,12 @@ class Member(object):
 
 class Population(object):
 	"""docstring for population"""
-	def __init__(self, size, dimensions, version):
+	def __init__(self, size, dimensions, length, version):
 		self.version = version
 		self.dimensions = dimensions
 		self.size = size
-		self.members = [Member(dimensions, version) for i in range(size)]
+		self.length = length
+		self.members = [Member(dimensions, length, version) for i in range(size)]
 	
 	def GetMember(self):
 		return self.members[randint(0,self.size-1)]
@@ -67,7 +68,7 @@ class Population(object):
 	def Mutate(self, Pops):
 		parent1 = self.GetMember()
 		parent2 = self.GetMember()
-		child = Member(self.dimensions, self.version)
+		child = Member(self.dimensions, self.length, self.version)
 
 		if(parent1.fitness>parent2.fitness):
 			if(self.version == 1):
@@ -87,58 +88,43 @@ class Population(object):
 			fitnessCheckers.append(Pops[randint(0,len(Pops)-1)].GetMember())
 		child.Fitness(fitnessCheckers)
 		self.Replace(child)
-
-size = 11
-generations = 600
-populations = [Population(size,1,2) for i in range(2)]
-values = []
-values1 = [[] for i in populations]
-values2 = [[] for i in populations]
-fitness1 = [[] for i in populations]
-#values2.append(values)
-for i in range(generations):
-	valuestemp1 = [[] for j in populations]
-	valuestemp2 = [[] for j in populations]
-	#fitnesstemp = [[] for j in populations]
-	for num,j in enumerate(populations):
-		populations_ex = [populations[k] for k in range(2) if k!=num]
-		
-		for k in range(int(size)):
-			j.Mutate(populations_ex)
-		fitsum = 0
-		for k in range(size):
+def Figure3():
+	size = 10
+	generations = 600
+	populations = [Population(size,1,100,2) for i in range(2)]
+	values = []
+	values1 = [[] for i in populations]
+	values2 = [[] for i in populations]
+	fitness1 = [[] for i in populations]
+	for i in range(generations):
+		valuestemp1 = [[] for j in populations]
+		valuestemp2 = [[] for j in populations]
+		for num,j in enumerate(populations):
+			populations_ex = [populations[k] for k in range(2) if k!=num]
 			
-			valuestemp1[num].append(populations[num].members[k].ToNumber(0))
-			fitsum = fitsum + populations[num].members[k].fitness
-			#valuestemp2[num].append(populations[num].members[k].ToNumber(1))
-		values1[num].append(valuestemp1[num])
-		fitsum = fitsum / size
-		fitness1[num].append(fitsum)
-		values2[num].append(valuestemp2[num])
-#print(values)
-fig, axs = pyplot.subplots(3, 1, gridspec_kw = {'height_ratios':[10, 1, 1]})
-#pyplot.figure(1)
-axs[0].plot(range(generations),values1[0],'b,')
-axs[0].plot(range(generations),values1[1],'r,')
-axs[0].plot(range(generations),[50 for i in range(generations)],'k:')
-axs[0].set_ylim(0,100)
-axs[0].set_xlim(0,generations)
-axs[0].set_ylabel("Objective Fitness")
-# pyplot.plot(range(generations),values1[0],'bo')
-# pyplot.plot(range(generations),values1[1],'go')
-#pyplot.figure(2,(10,1))
-axs[1].plot(range(generations),fitness1[0],'b,')
-axs[1].set_ylim(0,1)
-#axs[1].set_ylabel("Subjective Fitness")
-axs[2].plot(range(generations),fitness1[1],'r,')
-axs[2].set_ylim(0,1)
-axs[2].set_ylabel("Subjective Fitness")
-# pyplot.plot(range(generations),fitness1[0])
-# pyplot.plot(range(generations),fitness1[1])
-# pyplot.plot(range(generations),values2[0],'b^')
-# pyplot.plot(range(generations),values1[1],'go')
-# pyplot.plot(range(generations),values2[1],'g^')
-# pyplot.plot(range(generations),values2[2],'ro')
-# pyplot.plot(range(generations),values2[3],'co')
-# pyplot.plot(range(generations),values2[4],'mo')
+			for k in range(int(size)):
+				j.Mutate(populations_ex)
+			fitsum = 0
+			for k in range(size):
+				
+				valuestemp1[num].append(populations[num].members[k].ToNumber(0))
+				fitsum = fitsum + populations[num].members[k].fitness
+			values1[num].append(valuestemp1[num])
+			fitsum = fitsum / size
+			fitness1[num].append(fitsum)
+			values2[num].append(valuestemp2[num])
+	fig, axs = pyplot.subplots(3, 1, gridspec_kw = {'height_ratios':[10, 1, 1]})
+	axs[0].plot(range(generations),values1[0],'b,')
+	axs[0].plot(range(generations),values1[1],'r,')
+	axs[0].plot(range(generations),[50 for i in range(generations)],'k:')
+	axs[0].set_ylim(0,100)
+	axs[0].set_xlim(0,generations)
+	axs[0].set_ylabel("Objective Fitness")
+	axs[1].plot(range(generations),fitness1[0],'b,')
+	axs[1].set_ylim(0,1)
+	axs[2].plot(range(generations),fitness1[1],'r,')
+	axs[2].set_ylim(0,1)
+	axs[2].set_ylabel("Subjective Fitness")
+#def Figure4():
+Figure3()
 pyplot.show()
